@@ -1,72 +1,77 @@
-use fltk::{button::Button, frame::Frame, group::Group, prelude::*, window::Window};
-use fltk::enums::Color;
+use fltk::{frame::Frame, group::Group, prelude::*};
+use crate::screenmanager::Action;
 use crate::vidgets::{ButtonConfig, create_button};
 
-#[derive(Copy, Clone, Debug)]
-pub enum Action {
-    Start,
-    Settings,
-    Back,
-    Exit,
-}
-
-
 pub struct ButtonDef<'a> {
-    cfg: ButtonConfig<'a>,
-    action: Action,
+    pub x: i32,
+    pub y: i32,
+    pub w: i32,
+    pub h: i32,
+    pub label: &'a str,
+    pub action: Action,
 }
 
 pub fn build_main_menu(
     on_action: impl Fn(Action) + Clone + 'static,
 ) -> Group {
-    let mut group = Group::new(0, 0, 400, 300, "");
+    let group = Group::new(0, 0, 400, 300, "");
     Frame::new(0, 0, 400, 200, "Це головне меню");
 
     let buttons = vec![
         ButtonDef {
-            cfg: ButtonConfig { x: 50, y: 50, w: 120, h: 35, label: "Start" },
+            x: 50, y: 50, w: 120, h: 35,
+            label: "Start",
             action: Action::Start,
         },
         ButtonDef {
-            cfg: ButtonConfig { x: 50, y: 95, w: 120, h: 35, label: "Settings" },
+            x: 50, y: 95, w: 120, h: 35,
+            label: "Settings",
             action: Action::Settings,
+        },
+        ButtonDef {
+            x: 50, y: 140, w: 120, h: 35,
+            label: "Exit",
+            action: Action::Exit,
         },
     ];
 
     for b in buttons {
+        let on_action = on_action.clone();
         let action = b.action;
-        let cb = on_action.clone();
-
-        create_button(b.cfg, move || cb(action));
+        
+        create_button(
+            ButtonConfig {
+                x: b.x,
+                y: b.y,
+                w: b.w,
+                h: b.h,
+                label: b.label,
+            },
+            move || on_action(action)
+        );
     }
 
-    group.end();
     group
 }
+
 pub fn build_settings(
     on_action: impl Fn(Action) + Clone + 'static,
 ) -> Group {
-    let mut group = Group::new(0, 0, 400, 300, "");
-    Frame::new(0, 0, 400, 200, "Це головне меню");
+    let group = Group::new(0, 0, 400, 300, "");
+    Frame::new(0, 0, 400, 200, "Налаштування");
 
-    let buttons = vec![
-        ButtonDef {
-            cfg: ButtonConfig { x: 50, y: 50, w: 120, h: 35, label: "Start" },
-            action: Action::Start,
+    let on_action_clone = on_action.clone();
+    
+    create_button(
+        ButtonConfig {
+            x: 50,
+            y: 50,
+            w: 120,
+            h: 35,
+            label: "Назад",
         },
-        ButtonDef {
-            cfg: ButtonConfig { x: 50, y: 95, w: 120, h: 35, label: "Settings" },
-            action: Action::Settings,
-        },
-    ];
+        move || on_action_clone(Action::Back)
+    );
 
-    for b in buttons {
-        let action = b.action;
-        let cb = on_action.clone();
-
-        create_button(b.cfg, move || cb(action));
-    }
-
-    group.end();
     group
 }

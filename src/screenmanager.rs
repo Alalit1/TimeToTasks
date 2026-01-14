@@ -1,3 +1,6 @@
+use fltk::{prelude::*, group::Group};
+use fltk::app;
+
 #[derive(Copy, Clone, Debug)]
 pub enum Action {
     Start,
@@ -9,12 +12,6 @@ pub enum Action {
     Language,
 }
 
-// Структура для керування станом програми
-pub struct AppState {
-    current_window: WindowType,
-    main_window: *mut fltk::window::Window,
-}
-
 #[derive(Clone, Copy, PartialEq)]
 pub enum WindowType {
     MainMenu,
@@ -24,11 +21,20 @@ pub enum WindowType {
     Language,
 }
 
+// Структура для керування станом програми
+pub struct AppState {
+    current_window: WindowType,
+    content_group: Group,
+}
+
 impl AppState {
-    pub fn new(main_window: *mut fltk::window::Window) -> Self {
+    pub fn new(main_window: &mut fltk::window::Window) -> Self {
+        let content_group = Group::new(0, 0, 400, 300, "");
+        main_window.add(&content_group);
+        
         Self {
             current_window: WindowType::MainMenu,
-            main_window,
+            content_group,
         }
     }
     
@@ -54,12 +60,7 @@ impl AppState {
             },
             Action::Exit => {
                 println!("Вихід з програми");
-                // Закриваємо головне вікно
-                unsafe {
-                    if !self.main_window.is_null() {
-                        (*self.main_window).hide();
-                    }
-                }
+                // Вихід обробляється в main.rs
             },
         }
     }
@@ -74,22 +75,15 @@ impl AppState {
         self.content_group.clear();
         
         // 2. Створюємо новий вміст залежно від поточного вікна
-        match self.current_window {
-            WindowType::MainMenu => {
-                self.build_main_menu();
-            }
-            WindowType::Settings => {
-                self.build_settings();
-            }
-            WindowType::Mash => {
-                self.build_mash();
-            }
-            WindowType::Typing => {
-                self.build_typing();
-            }
-            WindowType::Language => {
-                self.build_language();
-            }
-        }
+        let label = match self.current_window {
+            WindowType::MainMenu => "Головне меню",
+            WindowType::Settings => "Налаштування",
+            WindowType::Mash => "Гра MASH",
+            WindowType::Typing => "Тренування друку",
+            WindowType::Language => "Мова",
+        };
+        
+        fltk::frame::Frame::new(0, 0, 400, 200, label)
+            .with_align(fltk::enums::Align::Center);
     }
 }

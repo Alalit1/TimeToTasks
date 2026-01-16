@@ -61,3 +61,37 @@ pub fn message_confirm(text: &str) -> MsgResult {
 
     MsgResult::Cancel
 }
+
+use fltk::{
+    input::Input,
+    enums::{Color, FrameType},
+};
+
+pub struct InputConfig<'a> {
+    pub x: i32,
+    pub y: i32,
+    pub w: i32,
+    pub h: i32,
+    pub label: &'a str,
+    pub placeholder: &'a str,
+}
+pub fn create_input(cfg: InputConfig) -> Input {
+    let mut input = Input::new(
+        cfg.x,
+        cfg.y,
+        cfg.w,
+        cfg.h,
+        cfg.label,
+    );
+
+    // Placeholder (підказка в полі)
+    input.set_value(cfg.placeholder);
+
+    // Стиль
+    input.set_color(Color::from_rgb(24, 24, 27));
+    input.set_text_color(Color::White);
+    input.set_frame(FrameType::RoundedBox);
+    input.set_text_size(14);
+
+    input
+}

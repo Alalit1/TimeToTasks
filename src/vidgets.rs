@@ -5,14 +5,17 @@ use fltk::{
     app, window::Window, frame::Frame,
     app::Sender, app::Receiver, app::channel,
 };
+use fltk::input::Input;
 
-pub struct ButtonConfig<'a> {
+pub struct ButtonConfig {
     pub x: i32,
     pub y: i32,
     pub w: i32,
     pub h: i32,
-    pub label: &'a str,
+    pub label: &'static str,
+    pub action: Action,
 }
+
 
 pub fn create_button<F>(
     cfg: ButtonConfig,
@@ -34,7 +37,6 @@ where
 #[derive(Clone, Copy)]
 pub enum MsgResult {
     Ok,
-    Cancel,
 }
 
 pub fn message_confirm(text: &str) -> MsgResult {
@@ -49,7 +51,7 @@ pub fn message_confirm(text: &str) -> MsgResult {
     let mut ok = Button::new(60, 100, 100, 35, "OK");
 
     ok.set_callback(move |_| s.send(MsgResult::Ok));
-    cancel.set_callback(move |_| s.send(MsgResult::Cancel));
+    
 
     win.end();
     win.show();
@@ -59,13 +61,9 @@ pub fn message_confirm(text: &str) -> MsgResult {
         return msg;
     }
 
-    MsgResult::Cancel
+    MsgResult::Ok
 }
 
-use fltk::{
-    input::Input,
-    enums::{Color, FrameType},
-};
 
 pub struct InputConfig<'a> {
     pub x: i32,
